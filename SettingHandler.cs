@@ -14,7 +14,9 @@ namespace SlideShowMaker2
     {
         public readonly frmMain _MainForm;
         public readonly Dictionary<string, CheckBox> ToggleOptions;
+        public readonly string LogFilePath;
         public bool autostart = false;
+        public bool LogToFile = false;
         public SettingHandler(frmMain Mainform)
         {
             _MainForm = Mainform;
@@ -24,6 +26,7 @@ namespace SlideShowMaker2
                 {"mute", _MainForm.chkMuteSound },
                 {"subfolders", _MainForm.chkSubFolders }
             };
+            LogFilePath = Reference.LogFolder + @"\" + $"Log {DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")}.log";
         }
 
         public void LoadSettings()
@@ -46,12 +49,31 @@ namespace SlideShowMaker2
                 ApplySettingsFromJson(ConvertStartingArgsToJson(StartingArgs), "Command Line");
                 if (StartingArgs.Any(x => x.ToLower().Trim() == "autostart")) { autostart = true; }
                 if (StartingArgs.Any(x => x.ToLower().Trim() == "kill")) { KillProgram(); }
+                if (StartingArgs.Any(x => x.ToLower().Trim() == "log")) 
+                { 
+                    CreateLogFile();
+                }
             }
+        }
+
+        public void CreateLogFile()
+        {
+            if (!Directory.Exists(Reference.AppDatapath))
+            {
+                Directory.CreateDirectory(Reference.AppDatapath);
+            }
+            if (!Directory.Exists(Reference.LogFolder))
+            {
+                Directory.CreateDirectory(Reference.LogFolder);
+            }
+            var LogFileInstance = File.Create(LogFilePath);
+            LogFileInstance.Close();
+            LogToFile = true;
         }
 
         public void ApplySettingsFromJson(string Json, string Source)
         {
-            Console.WriteLine($"Applying Settings From {Source}");
+            frmMain._SettingHandler.WriteLine($"Applying Settings From {Source}");
             Dictionary<string, string> Settings;
             try { Settings = new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(Json); }
             catch { return; }
@@ -60,24 +82,24 @@ namespace SlideShowMaker2
             {
                 if (Settings.ContainsKey(i.Key) && bool.TryParse(Settings[i.Key], out bool BoolResult))
                 {
-                    Console.WriteLine($"Contained Key {i.Key}. Value {Settings[i.Key]}");
+                    frmMain._SettingHandler.WriteLine($"Contained Key {i.Key}. Value {Settings[i.Key]}");
                     i.Value.Checked = BoolResult;
                 }
             }
 
             if (Settings.ContainsKey("path"))
             {
-                Console.WriteLine($"Contained Key Path. Value {Settings["path"] }");
+                frmMain._SettingHandler.WriteLine($"Contained Key Path. Value {Settings["path"] }");
                 _MainForm.txtFolderPath.Text = Settings["path"];
             }
             if (Settings.ContainsKey("interval") && int.TryParse(Settings["interval"], out int IntervalResult) && IntervalResult > 1)
             {
-                Console.WriteLine($"Contained Key interval. Value {Settings["interval"] }");
+                frmMain._SettingHandler.WriteLine($"Contained Key interval. Value {Settings["interval"] }");
                 _MainForm.nudInterval.Value = IntervalResult;
             }
             if (Settings.ContainsKey("timeframe"))
             {
-                Console.WriteLine($"Contained Key timeframe. Value {Settings["timeframe"] }");
+                frmMain._SettingHandler.WriteLine($"Contained Key timeframe. Value {Settings["timeframe"] }");
                 switch (Settings["timeframe"])
                 {
                     case "s":
@@ -99,7 +121,7 @@ namespace SlideShowMaker2
 
             foreach (var i in StartingArgs)
             {
-                Console.WriteLine(i);
+                frmMain._SettingHandler.WriteLine(i);
                 var ParsedArg = ParseArgument(i);
                 if (ParsedArg == null) { continue; }
                 OptionsDict.Add(ParsedArg[0], ParsedArg[1]);
@@ -159,6 +181,19 @@ namespace SlideShowMaker2
                 }
             }
             Process.GetCurrentProcess().Kill();
+        }
+
+        public void WriteLine(string Data)
+        {
+            Console.WriteLine(Data);
+            if (File.Exists(LogFilePath) && LogToFile)
+            {
+                using (StreamWriter sw = File.AppendText(LogFilePath))
+                {
+                    sw.WriteLine($"[{DateTime.Now}]" + Data);
+                    sw.Close();
+                }
+            }
         }
     }
 }

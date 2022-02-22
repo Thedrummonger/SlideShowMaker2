@@ -65,7 +65,7 @@ namespace SlideShowMaker2
         private void frmDisplay_Shown(object sender, EventArgs e)
         {
             Cursor.Hide();
-            Console.WriteLine("Form Shown");
+            frmMain._SettingHandler.WriteLine("Form Shown");
             AlignPictureBox();
             AlignVideoPlayer();
 
@@ -77,33 +77,33 @@ namespace SlideShowMaker2
 
         private void tmrTransition_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("Transition Timer Tick");
+            frmMain._SettingHandler.WriteLine("Transition Timer Tick");
             PlayNextFile();
         }
 
         private void PlayNextFile()
         {
-            Console.WriteLine("Playing Next File");
+            frmMain._SettingHandler.WriteLine("Playing Next File");
             string PreviousFile = _CurrentFile;
 
             var ValidFiles = GetFiles();
 
             if (ValidFiles.Count < 1) 
-            { 
-                Console.WriteLine($"No files exist, showing last available"); 
+            {
+                frmMain._SettingHandler.WriteLine($"No files exist, showing last available"); 
                 return; 
             }
             else if (ValidFiles.Count == 1)
             {
-                Console.WriteLine($"Single File Exists, Setting as Current File.");
+                frmMain._SettingHandler.WriteLine($"Single File Exists, Setting as Current File.");
                 _CurrentFile = ValidFiles[0];
             }
             else if (ValidFiles.Count > 1)
             {
-                Console.WriteLine($"getting Next File in Sequence.");
+                frmMain._SettingHandler.WriteLine($"getting Next File in Sequence.");
                 if (!PlayingPreviousFile && !string.IsNullOrWhiteSpace(_CurrentFile))
                 {
-                    Console.WriteLine($"adding {_CurrentFile} to History list.");
+                    frmMain._SettingHandler.WriteLine($"adding {_CurrentFile} to History list.");
                     FileHistory.Add(_CurrentFile);
                 }
                 GetNextFile(ValidFiles);
@@ -121,7 +121,7 @@ namespace SlideShowMaker2
 
         private void PlayVideo(string newFile)
         {
-            Console.WriteLine($"Playing Video {newFile}");
+            frmMain._SettingHandler.WriteLine($"Playing Video {newFile}");
             pictureBox1.Visible = false;
             axWindowsMediaPlayer1.Visible = true;
             axWindowsMediaPlayer1.URL = newFile;
@@ -132,14 +132,14 @@ namespace SlideShowMaker2
             tmrVideoManager.Interval = 10;
             tmrVideoManager.Start();
 
-            Console.WriteLine("Scanning Video Satus");
+            frmMain._SettingHandler.WriteLine("Scanning Video Satus");
         }
 
         private void tmrVideoManager_Tick(object sender, EventArgs e)
         {
             if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsStopped)
             {
-                Console.WriteLine($"Video has Stopped");
+                frmMain._SettingHandler.WriteLine($"Video has Stopped");
                 try { axWindowsMediaPlayer1.fullScreen = false; }
                 catch { }
                 tmrTransition.Start();
@@ -148,7 +148,7 @@ namespace SlideShowMaker2
             }
             else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying && !axWindowsMediaPlayer1.fullScreen)
             {
-                Console.WriteLine($"Attempting to fullscreen video");
+                frmMain._SettingHandler.WriteLine($"Attempting to fullscreen video");
                 try { axWindowsMediaPlayer1.fullScreen = true; } catch { }
             }
         }
@@ -160,7 +160,7 @@ namespace SlideShowMaker2
 
         private void DisplayImage(string newFile)
         {
-            Console.WriteLine($"Displaying Image {newFile}");
+            frmMain._SettingHandler.WriteLine($"Displaying Image {newFile}");
             axWindowsMediaPlayer1.Visible = false;
             pictureBox1.Visible = true;
             pictureBox1.Image = CopyImageFromFileStream(newFile);
@@ -187,26 +187,26 @@ namespace SlideShowMaker2
         {
             if (PlayingPreviousFile)
             {
-                Console.WriteLine($"Getting Previous File");
+                frmMain._SettingHandler.WriteLine($"Getting Previous File");
                 PlayingPreviousFile = false;
                 while (FileHistory.Any() && !File.Exists(FileHistory[FileHistory.Count - 1]))
                 {
-                    Console.WriteLine($"{FileHistory[FileHistory.Count - 1]} No longer Exists");
+                    frmMain._SettingHandler.WriteLine($"{FileHistory[FileHistory.Count - 1]} No longer Exists");
                     FileHistory.RemoveAt(FileHistory.Count - 1);
                 }
                 if (!FileHistory.Any())
                 {
-                    Console.WriteLine($"No valid files in history record");
+                    frmMain._SettingHandler.WriteLine($"No valid files in history record");
                     return;
                 }
-                Console.WriteLine($"{FileHistory[FileHistory.Count - 1]} was last file");
+                frmMain._SettingHandler.WriteLine($"{FileHistory[FileHistory.Count - 1]} was last file");
 
                 _CurrentFile = FileHistory[FileHistory.Count - 1];
                 FileHistory.RemoveAt(FileHistory.Count - 1);
             }
             else if (_Shuffle)
             {
-                Console.WriteLine($"Getting Random File.");
+                frmMain._SettingHandler.WriteLine($"Getting Random File.");
                 string NewFile = _CurrentFile;
 
                 while (NewFile == _CurrentFile)
@@ -219,10 +219,10 @@ namespace SlideShowMaker2
             else
             {
                 var currentIndex = validFiles.IndexOf(_CurrentFile);
-                Console.WriteLine($"Current Index is {currentIndex}");
+                frmMain._SettingHandler.WriteLine($"Current Index is {currentIndex}");
                 currentIndex++;
                 if (currentIndex > validFiles.Count - 1) { currentIndex = 0; }
-                Console.WriteLine($"Getting file at new index {currentIndex}.");
+                frmMain._SettingHandler.WriteLine($"Getting file at new index {currentIndex}.");
                 _CurrentFile = validFiles[currentIndex];
             }
         }
@@ -302,7 +302,7 @@ namespace SlideShowMaker2
 
         private void tmrMaintenance_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine("Maintenance code run");
+            frmMain._SettingHandler.WriteLine("Maintenance code run");
             Reference.KeepAlive();
         }
     }

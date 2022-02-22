@@ -13,6 +13,7 @@ namespace SlideShowMaker2
         public static readonly string AppDatapath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SlideShowMaker");
         public static readonly string OptionsFile = Path.Combine(AppDatapath, "Options.ini");
         public static readonly string DefaultOptions = Path.Combine(AppDatapath, "DefaultOptions.ini");
+        public static readonly string LogFolder = Path.Combine(AppDatapath, "Logs");
         public static readonly List<string> ImageExtensions = new List<string>() { ".JPG", ".JPEG", ".BMP", ".GIF", ".PNG" };
         public static readonly List<string> VideoExtensions = new List<string>() { ".MP4", ".WMV", ".AVI" };
         [Flags]
