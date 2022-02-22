@@ -16,6 +16,7 @@ namespace SlideShowMaker2
         public static readonly string LogFolder = Path.Combine(AppDatapath, "Logs");
         public static readonly List<string> ImageExtensions = new List<string>() { ".JPG", ".JPEG", ".BMP", ".GIF", ".PNG" };
         public static readonly List<string> VideoExtensions = new List<string>() { ".MP4", ".WMV", ".AVI" };
+        public static readonly List<string> AudioExtensions = new List<string>() { ".MP3", ".WAV", ".OGG" };
         [Flags]
         public enum EXECUTION_STATE : uint
         {
@@ -43,6 +44,10 @@ namespace SlideShowMaker2
         public static bool isMedia(this string File)
         {
             return File.isVideo() || File.isImage();
+        }
+        public static bool isAudio(this string File)
+        {
+            return AudioExtensions.Contains(Path.GetExtension(File).ToUpperInvariant());
         }
 
     }

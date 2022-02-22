@@ -23,6 +23,7 @@ namespace SlideShowMaker2
         private readonly Random rnd;
         private readonly SearchOption _DirectorySearchOption;
         private string _CurrentFile;
+        private string _CurrentAudioFile;
         private bool PlayingPreviousFile;
         public frmDisplay(string FileDirectory, int Interval, bool Shuffle, int TimeFrame, bool MuteVideoSound, CheckBox DirectorysearchOption)
         {
@@ -41,8 +42,11 @@ namespace SlideShowMaker2
             tmrTransition.Stop();
             tmrMaintenance.Stop();
             tmrVideoManager.Stop();
+            tmrAudioManager.Stop();
 
-            WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)axWindowsMediaPlayer1.Ctlcontrols;
+            WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)VideoPlayer.Ctlcontrols;
+            controls.stop();
+            controls = (WMPLib.IWMPControls3)SoundPlayer.Ctlcontrols;
             controls.stop();
 
             this.Close();
@@ -69,10 +73,17 @@ namespace SlideShowMaker2
             AlignPictureBox();
             AlignVideoPlayer();
 
+            //File Playback
             tmrTransition.Enabled = true;
             tmrTransition.Interval = _Interval;
             tmrTransition.Start();
             PlayNextFile();
+
+            //Audio Playback
+            tmrAudioManager.Enabled = true;
+            tmrAudioManager.Interval = 10;
+            tmrAudioManager.Start();
+            PlayNextAudioFile();
         }
 
         private void tmrTransition_Tick(object sender, EventArgs e)
@@ -123,9 +134,9 @@ namespace SlideShowMaker2
         {
             frmMain._SettingHandler.WriteLine($"Playing Video {newFile}");
             pictureBox1.Visible = false;
-            axWindowsMediaPlayer1.Visible = true;
-            axWindowsMediaPlayer1.URL = newFile;
-            axWindowsMediaPlayer1.settings.mute = _MuteVideoSound;
+            VideoPlayer.Visible = true;
+            VideoPlayer.URL = newFile;
+            VideoPlayer.settings.mute = _MuteVideoSound;
 
             tmrTransition.Stop();
 
@@ -137,19 +148,19 @@ namespace SlideShowMaker2
 
         private void tmrVideoManager_Tick(object sender, EventArgs e)
         {
-            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsStopped)
+            if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsStopped)
             {
                 frmMain._SettingHandler.WriteLine($"Video has Stopped");
-                try { axWindowsMediaPlayer1.fullScreen = false; }
+                try { VideoPlayer.fullScreen = false; }
                 catch { }
                 tmrTransition.Start();
                 tmrVideoManager.Stop();
                 PlayNextFile();
             }
-            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying && !axWindowsMediaPlayer1.fullScreen)
+            else if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying && !VideoPlayer.fullScreen)
             {
                 frmMain._SettingHandler.WriteLine($"Attempting to fullscreen video");
-                try { axWindowsMediaPlayer1.fullScreen = true; } catch { }
+                try { VideoPlayer.fullScreen = true; } catch { }
             }
         }
 
@@ -161,7 +172,7 @@ namespace SlideShowMaker2
         private void DisplayImage(string newFile)
         {
             frmMain._SettingHandler.WriteLine($"Displaying Image {newFile}");
-            axWindowsMediaPlayer1.Visible = false;
+            VideoPlayer.Visible = false;
             pictureBox1.Visible = true;
             pictureBox1.Image = CopyImageFromFileStream(newFile);
         }
@@ -176,11 +187,11 @@ namespace SlideShowMaker2
 
         private void AlignVideoPlayer()
         {
-            axWindowsMediaPlayer1.uiMode = "none";
-            axWindowsMediaPlayer1.Location = new Point(0, 0);
-            axWindowsMediaPlayer1.Height = this.Height;
-            axWindowsMediaPlayer1.Width = this.Width;
-            axWindowsMediaPlayer1.stretchToFit = true;
+            VideoPlayer.uiMode = "none";
+            VideoPlayer.Location = new Point(0, 0);
+            VideoPlayer.Height = this.Height;
+            VideoPlayer.Width = this.Width;
+            VideoPlayer.stretchToFit = true;
         }
 
         private void GetNextFile(List<string> validFiles)
@@ -227,20 +238,20 @@ namespace SlideShowMaker2
             }
         }
 
-        private List<string> GetFiles()
+        ///<summary>
+        ///Valid File Types image, video, audio, media.
+        ///</summary>
+        private List<string> GetFiles(string type = "media")
         {
-            if (!Directory.Exists(_FileDirectory))
-            {
-                return new List<string>();
-            }
+            if (!Directory.Exists(_FileDirectory)) { return new List<string>(); }
 
             List<string> ValidFiles = new List<string>();
 
             foreach (var i in Directory.GetFiles(_FileDirectory, "*.*", _DirectorySearchOption))
             {
-                if (i.isMedia())
-                {
-                    ValidFiles.Add(i);
+                if ((type == "media" && i.isMedia()) || (type == "audio" && i.isAudio()) || (type == "video" && i.isVideo()) || (type == "image" && i.isImage()))
+                { 
+                    ValidFiles.Add(i); 
                 }
             }
 
@@ -287,15 +298,15 @@ namespace SlideShowMaker2
         {
             if (e.nKeyCode == ((short)Keys.Escape))
             {
-                WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)axWindowsMediaPlayer1.Ctlcontrols;
+                WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)VideoPlayer.Ctlcontrols;
                 controls.stop();
                 ExitPreview();
             }
             else if (e.nKeyCode == ((short)Keys.Tab) || e.nKeyCode == ((short)Keys.Back))
             {
-                if (axWindowsMediaPlayer1.playState != WMPLib.WMPPlayState.wmppsPlaying) { return; }
+                if (VideoPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying) { return; }
                 PlayingPreviousFile = (e.nKeyCode == ((short)Keys.Back));
-                WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)axWindowsMediaPlayer1.Ctlcontrols;
+                WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)VideoPlayer.Ctlcontrols;
                 controls.stop();
             }
         }
@@ -305,5 +316,63 @@ namespace SlideShowMaker2
             frmMain._SettingHandler.WriteLine("Maintenance code run");
             Reference.KeepAlive();
         }
+
+        //================================================================================================
+
+        #region AudioPlayer
+
+        private void tmrAudioManager_Tick(object sender, EventArgs e)
+        {
+            if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying && !_MuteVideoSound)
+            {
+                if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                {
+                    frmMain._SettingHandler.WriteLine("Pausing Music for video");
+                    WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)SoundPlayer.Ctlcontrols;
+                    controls.pause();
+                }
+            }
+            else if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsPaused)
+            {
+                frmMain._SettingHandler.WriteLine("Resuming Music");
+                WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)SoundPlayer.Ctlcontrols;
+                controls.play();
+            }
+            else if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsStopped || SoundPlayer.playState == WMPLib.WMPPlayState.wmppsUndefined)
+            {
+                PlayNextAudioFile();
+            }
+        }
+
+        private void PlayNextAudioFile()
+        {
+            var validFiles = GetFiles("audio");
+            if (!validFiles.Any()) { return; }
+            frmMain._SettingHandler.WriteLine("Playing Next Song");
+            if (validFiles.Count == 1) { _CurrentAudioFile = validFiles[0]; }
+            if (_Shuffle)
+            {
+                frmMain._SettingHandler.WriteLine("Playing Random Song");
+                string NewFile = _CurrentAudioFile;
+
+                while (NewFile == _CurrentAudioFile)
+                {
+                    int r = rnd.Next(validFiles.Count);
+                    NewFile = validFiles[r];
+                }
+                frmMain._SettingHandler.WriteLine($"Song {NewFile} Chosen");
+                _CurrentAudioFile = NewFile;
+            }
+            else
+            {
+                var currentIndex = validFiles.IndexOf(_CurrentAudioFile);
+                currentIndex++;
+                if (currentIndex > validFiles.Count - 1) { currentIndex = 0; }
+                _CurrentAudioFile = validFiles[currentIndex];
+                frmMain._SettingHandler.WriteLine($"Playing Next Song in sequence {_CurrentAudioFile}");
+            }
+            SoundPlayer.URL = _CurrentAudioFile;
+        }
+        #endregion AudioPlayer
     }
 }

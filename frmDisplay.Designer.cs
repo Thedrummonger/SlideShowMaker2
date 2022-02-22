@@ -33,11 +33,14 @@ namespace SlideShowMaker2
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmDisplay));
             this.tmrTransition = new System.Windows.Forms.Timer(this.components);
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
+            this.VideoPlayer = new AxWMPLib.AxWindowsMediaPlayer();
             this.tmrMaintenance = new System.Windows.Forms.Timer(this.components);
             this.tmrVideoManager = new System.Windows.Forms.Timer(this.components);
+            this.SoundPlayer = new AxWMPLib.AxWindowsMediaPlayer();
+            this.tmrAudioManager = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.VideoPlayer)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SoundPlayer)).BeginInit();
             this.SuspendLayout();
             // 
             // tmrTransition
@@ -53,17 +56,17 @@ namespace SlideShowMaker2
             this.pictureBox1.TabStop = false;
             this.pictureBox1.DoubleClick += new System.EventHandler(this.PictureBox1_DoubleClick);
             // 
-            // axWindowsMediaPlayer1
+            // VideoPlayer
             // 
-            this.axWindowsMediaPlayer1.Enabled = true;
-            this.axWindowsMediaPlayer1.Location = new System.Drawing.Point(358, 192);
-            this.axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
-            this.axWindowsMediaPlayer1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer1.OcxState")));
-            this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(275, 137);
-            this.axWindowsMediaPlayer1.TabIndex = 3;
-            this.axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.axWindowsMediaPlayer1_PlayStateChange);
-            this.axWindowsMediaPlayer1.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
-            this.axWindowsMediaPlayer1.KeyUpEvent += new AxWMPLib._WMPOCXEvents_KeyUpEventHandler(this.axWindowsMediaPlayer1_KeyUpEvent);
+            this.VideoPlayer.Enabled = true;
+            this.VideoPlayer.Location = new System.Drawing.Point(358, 192);
+            this.VideoPlayer.Name = "VideoPlayer";
+            this.VideoPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("VideoPlayer.OcxState")));
+            this.VideoPlayer.Size = new System.Drawing.Size(275, 137);
+            this.VideoPlayer.TabIndex = 3;
+            this.VideoPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.axWindowsMediaPlayer1_PlayStateChange);
+            this.VideoPlayer.DoubleClickEvent += new AxWMPLib._WMPOCXEvents_DoubleClickEventHandler(this.axWindowsMediaPlayer1_DoubleClickEvent);
+            this.VideoPlayer.KeyUpEvent += new AxWMPLib._WMPOCXEvents_KeyUpEventHandler(this.axWindowsMediaPlayer1_KeyUpEvent);
             // 
             // tmrMaintenance
             // 
@@ -73,12 +76,27 @@ namespace SlideShowMaker2
             // 
             this.tmrVideoManager.Tick += new System.EventHandler(this.tmrVideoManager_Tick);
             // 
+            // SoundPlayer
+            // 
+            this.SoundPlayer.Enabled = true;
+            this.SoundPlayer.Location = new System.Drawing.Point(56, 260);
+            this.SoundPlayer.Name = "SoundPlayer";
+            this.SoundPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("SoundPlayer.OcxState")));
+            this.SoundPlayer.Size = new System.Drawing.Size(275, 137);
+            this.SoundPlayer.TabIndex = 4;
+            this.SoundPlayer.Visible = false;
+            // 
+            // tmrAudioManager
+            // 
+            this.tmrAudioManager.Tick += new System.EventHandler(this.tmrAudioManager_Tick);
+            // 
             // frmDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.axWindowsMediaPlayer1);
+            this.Controls.Add(this.SoundPlayer);
+            this.Controls.Add(this.VideoPlayer);
             this.Controls.Add(this.pictureBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmDisplay";
@@ -89,7 +107,8 @@ namespace SlideShowMaker2
             this.DoubleClick += new System.EventHandler(this.PictureBox1_DoubleClick);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.frmDisplay_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.VideoPlayer)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SoundPlayer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -97,8 +116,10 @@ namespace SlideShowMaker2
         #endregion
         private System.Windows.Forms.Timer tmrTransition;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
+        private AxWMPLib.AxWindowsMediaPlayer VideoPlayer;
         private System.Windows.Forms.Timer tmrMaintenance;
         private System.Windows.Forms.Timer tmrVideoManager;
+        private AxWMPLib.AxWindowsMediaPlayer SoundPlayer;
+        private System.Windows.Forms.Timer tmrAudioManager;
     }
 }
