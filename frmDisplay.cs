@@ -44,9 +44,6 @@ namespace SlideShowMaker2
 
             WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)axWindowsMediaPlayer1.Ctlcontrols;
             controls.stop();
-            try { axWindowsMediaPlayer1.fullScreen = false; } catch { }
-
-            Cursor.Show();
 
             this.Close();
         }
@@ -67,6 +64,7 @@ namespace SlideShowMaker2
 
         private void frmDisplay_Shown(object sender, EventArgs e)
         {
+            Cursor.Hide();
             Console.WriteLine("Form Shown");
             AlignPictureBox();
             AlignVideoPlayer();
@@ -306,8 +304,6 @@ namespace SlideShowMaker2
         {
             Console.WriteLine("Maintenance code run");
             Reference.KeepAlive();
-            if (this.ClientRectangle.Contains(PointToClient(Control.MousePosition))) { Cursor.Hide(); }
-            else { Cursor.Show(); }
         }
     }
 }

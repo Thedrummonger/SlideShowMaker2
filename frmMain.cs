@@ -34,7 +34,6 @@ namespace SlideShowMaker2
                 chkMuteSound.Checked, 
                 chkSubFolders
             );
-            Cursor.Hide();
             Display.ShowDialog();
             Console.WriteLine("Preiveiew ended");
             Cursor.Show();
