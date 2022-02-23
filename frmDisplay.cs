@@ -148,16 +148,18 @@ namespace SlideShowMaker2
 
         private void tmrVideoManager_Tick(object sender, EventArgs e)
         {
-            if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsStopped)
+            if (VideoPlayer.Stopped())
             {
                 frmMain._SettingHandler.WriteLine($"Video has Stopped");
                 try { VideoPlayer.fullScreen = false; }
                 catch { }
                 tmrTransition.Start();
                 tmrVideoManager.Stop();
+                VideoPlayer.URL = null;
+                VideoPlayer.close();
                 PlayNextFile();
             }
-            else if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying && !VideoPlayer.fullScreen)
+            else if (VideoPlayer.Playing() && !VideoPlayer.fullScreen)
             {
                 frmMain._SettingHandler.WriteLine($"Attempting to fullscreen video");
                 try { VideoPlayer.fullScreen = true; } catch { }
@@ -249,7 +251,7 @@ namespace SlideShowMaker2
 
             foreach (var i in Directory.GetFiles(_FileDirectory, "*.*", _DirectorySearchOption))
             {
-                if ((type == "media" && i.isMedia()) || (type == "audio" && i.isAudio()) || (type == "video" && i.isVideo()) || (type == "image" && i.isImage()))
+                if (((type == "image" || type == "media") && i.isImage()) || ((type == "video" || type == "media") && i.isVideo()) || (type == "audio" && i.isAudio()))
                 { 
                     ValidFiles.Add(i); 
                 }
@@ -304,7 +306,7 @@ namespace SlideShowMaker2
             }
             else if (e.nKeyCode == ((short)Keys.Tab) || e.nKeyCode == ((short)Keys.Back))
             {
-                if (VideoPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying) { return; }
+                if (!VideoPlayer.Playing()) { return; }
                 PlayingPreviousFile = (e.nKeyCode == ((short)Keys.Back));
                 WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)VideoPlayer.Ctlcontrols;
                 controls.stop();
@@ -323,23 +325,25 @@ namespace SlideShowMaker2
 
         private void tmrAudioManager_Tick(object sender, EventArgs e)
         {
-            if (VideoPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying && !_MuteVideoSound)
+            if (VideoPlayer.Playing() && !_MuteVideoSound)
             {
-                if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                if (SoundPlayer.Playing())
                 {
                     frmMain._SettingHandler.WriteLine("Pausing Music for video");
                     WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)SoundPlayer.Ctlcontrols;
                     controls.pause();
                 }
             }
-            else if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsPaused)
+            else if (SoundPlayer.Paused())
             {
                 frmMain._SettingHandler.WriteLine("Resuming Music");
                 WMPLib.IWMPControls3 controls = (WMPLib.IWMPControls3)SoundPlayer.Ctlcontrols;
                 controls.play();
             }
-            else if (SoundPlayer.playState == WMPLib.WMPPlayState.wmppsStopped || SoundPlayer.playState == WMPLib.WMPPlayState.wmppsUndefined)
+            else if (SoundPlayer.Stopped() || SoundPlayer.Undefined())
             {
+                SoundPlayer.URL = null;
+                SoundPlayer.close();
                 PlayNextAudioFile();
             }
         }

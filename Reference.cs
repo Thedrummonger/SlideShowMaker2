@@ -41,13 +41,25 @@ namespace SlideShowMaker2
         {
             return VideoExtensions.Contains(Path.GetExtension(File).ToUpperInvariant());
         }
-        public static bool isMedia(this string File)
-        {
-            return File.isVideo() || File.isImage();
-        }
         public static bool isAudio(this string File)
         {
             return AudioExtensions.Contains(Path.GetExtension(File).ToUpperInvariant());
+        }
+        public static bool Playing(this AxWMPLib.AxWindowsMediaPlayer player)
+        {
+            return player.playState == WMPLib.WMPPlayState.wmppsPlaying;
+        }
+        public static bool Stopped(this AxWMPLib.AxWindowsMediaPlayer player)
+        {
+            return player.playState == WMPLib.WMPPlayState.wmppsStopped;
+        }
+        public static bool Paused(this AxWMPLib.AxWindowsMediaPlayer player)
+        {
+            return player.playState == WMPLib.WMPPlayState.wmppsPaused;
+        }
+        public static bool Undefined(this AxWMPLib.AxWindowsMediaPlayer player)
+        {
+            return player.playState == WMPLib.WMPPlayState.wmppsUndefined;
         }
 
     }
