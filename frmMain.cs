@@ -79,7 +79,10 @@ namespace SlideShowMaker2
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            _SettingHandler.SaveCurrentSettingsToFile(Reference.OptionsFile);
+            if (!_SettingHandler.TempSettings)
+            {
+                _SettingHandler.SaveCurrentSettingsToFile(Reference.OptionsFile);
+            }
         }
 
         private void frmMain_KeyUp(object sender, KeyEventArgs e)

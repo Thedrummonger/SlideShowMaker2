@@ -35,6 +35,14 @@ Functionality
 		-Tab: Procedes the next file
 		-Backspace: Goes back to the previous File
 
+-Audio Playback
+	-Audio files can be added to the file folder to allow for audio playback along with the slide.
+	-The Following audio file types are supported.
+		-(".MP3", ".WAV", ".OGG")
+	-Audio files can be added and removed live similar to images and videos.
+	-Audio files will be played in sequential order similar to image/video files and will shuffle if the "shuffle" option is selected.
+	-Audio files will be paused when a video is played, unless the "Mute video sound" option is enabled.
+
 -Ordering Files
 	-If the “Shuffle” option is not selected, the files will be displayed in the same order they are shown in the folder (assuming the folder is sorted by name). To manually order files, change the name to begin with a number (01, 02, 03, etc...)
 		-Example:
@@ -47,10 +55,10 @@ Functionality
 
 
 ============================================================================================================================================================================================================
-Advanced Used
+Advanced Use
 
 -Startup Options
-	-By Default, the program will launch with the same options it was last closed with.
+	-When the program is closed, it current setting will be saved and loaded upon next launch.
 	-Pressing f4 will lock the current settings as default. Even if the settings are changed, the next time the program is opened these default settings will be loaded. This can be undone by pressing f4 	again.
 	-These options are stored as files in the "%appdata%\SlideShowMaker" folder on your PC
 		-The options saved when the application closes are saved in the "Options.ini" File.
@@ -58,7 +66,7 @@ Advanced Used
 			-If you would like certain options to not have a default setting while keeping defaults for others, you can delete those entries from the "DefaultOptions.ini" file individually.
 
 -Command Line
-	-The program can be launched from the command line and will take arguments for each setting. Command line arguments will have priority over Default options
+	-The program can be launched from the command line and will take arguments for each setting. Command line arguments will have priority over Options and Default Options.
 		-Command line arguments are structured as follows
 			Key=value
 		-"Key" is the name of the option and "value" is what is assigned to it
@@ -86,6 +94,10 @@ Advanced Used
 				-will automatically start the slide show when the program is launched.
 			-kill
 				-Will close any open instance of the program. Useful when managing the application remotely.
+			-log
+				-Writes dev output to a log file located in . should not be enabled unless you are troubleshooting.
+			-temp
+				-Prevents any setting changes from being saved upon exiting the program this session. Useful for running temporary slides with abnormal settings
 			-Any True/False argument
 				-Any argument which only takes true or false can be used without a value, in which case it will default too “true”.
 		-Examples

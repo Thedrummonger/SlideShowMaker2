@@ -17,6 +17,7 @@ namespace SlideShowMaker2
         public readonly string LogFilePath;
         public bool autostart = false;
         public bool LogToFile = false;
+        public bool TempSettings = false;
         public SettingHandler(frmMain Mainform)
         {
             _MainForm = Mainform;
@@ -49,10 +50,8 @@ namespace SlideShowMaker2
                 ApplySettingsFromJson(ConvertStartingArgsToJson(StartingArgs), "Command Line");
                 if (StartingArgs.Any(x => x.ToLower().Trim() == "autostart")) { autostart = true; }
                 if (StartingArgs.Any(x => x.ToLower().Trim() == "kill")) { KillProgram(); }
-                if (StartingArgs.Any(x => x.ToLower().Trim() == "log")) 
-                { 
-                    CreateLogFile();
-                }
+                if (StartingArgs.Any(x => x.ToLower().Trim() == "log")) { CreateLogFile(); }
+                if (StartingArgs.Any(x => x.ToLower().Trim() == "temp")) { TempSettings = true; }
             }
         }
 
@@ -102,15 +101,9 @@ namespace SlideShowMaker2
                 frmMain._SettingHandler.WriteLine($"Contained Key timeframe. Value {Settings["timeframe"] }");
                 switch (Settings["timeframe"])
                 {
-                    case "s":
-                        _MainForm.cmbTimeFrame.SelectedIndex = 0;
-                        break;
-                    case "m":
-                        _MainForm.cmbTimeFrame.SelectedIndex = 1;
-                        break;
-                    case "h":
-                        _MainForm.cmbTimeFrame.SelectedIndex = 2;
-                        break;
+                    case "s": _MainForm.cmbTimeFrame.SelectedIndex = 0; break;
+                    case "m": _MainForm.cmbTimeFrame.SelectedIndex = 1; break;
+                    case "h":  _MainForm.cmbTimeFrame.SelectedIndex = 2; break;
                 }
             }
         }
