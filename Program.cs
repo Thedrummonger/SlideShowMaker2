@@ -43,12 +43,14 @@ namespace SlideShowMaker2
             if(Environment.GetCommandLineArgs().Count() > 1 && Environment.GetCommandLineArgs().Any(x => x.ToLower() == "console"))
             {
                 AttachConsole(-1);
-                process.Kill();
+                process.Suspend();
             }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new frmMain());
+
+            process.Resume();
         }
 
     }
